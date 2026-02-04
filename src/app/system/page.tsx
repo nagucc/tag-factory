@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, Form, Input, Button, Switch, Select, Typography, message, Divider, Space } from 'antd';
+import { Card, Form, Input, Button, Select, Typography, message, Divider, Space } from 'antd';
 import { SaveOutlined, SecurityScanOutlined, GlobalOutlined, UserOutlined } from '@ant-design/icons';
+import MainLayout from '@/components/MainLayout';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -16,16 +17,8 @@ interface SystemConfig {
 }
 
 export default function SystemConfigPage() {
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
-  const [config, setConfig] = useState<SystemConfig>({
-    appName: 'Tag Factory',
-    appEnv: 'development',
-    jwtExpiresIn: '7d',
-    maxLoginAttempts: 5,
-    lockoutDuration: 30,
-  });
 
   useEffect(() => {
     fetchConfig();
@@ -36,17 +29,14 @@ export default function SystemConfigPage() {
       const response = await fetch('/api/system/config');
       const data = await response.json();
       if (data.success) {
-        setConfig(data.data);
         form.setFieldsValue(data.data);
       }
     } catch {
       message.error('获取系统配置失败');
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: SystemConfig) => {
     setSaving(true);
     try {
       const response = await fetch('/api/system/config', {
@@ -67,8 +57,8 @@ export default function SystemConfigPage() {
     }
   };
 
-  return (
-    <div style={{ padding: 24 }}>
+  const pageContent = (
+    <>
       <Title level={2}>系统配置</Title>
       <Text type="secondary">管理系统核心参数和安全设置</Text>
       
@@ -166,6 +156,8 @@ export default function SystemConfigPage() {
           </Space>
         </Form.Item>
       </Form>
-    </div>
+    </>
   );
+
+  return <MainLayout title="系统配置">{pageContent}</MainLayout>;
 }

@@ -1,15 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Form, Input, Button, Card, message, Typography } from 'antd';
+import { Form, Input, Button, Card, Typography } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import { App } from 'antd';
 
 const { Title, Text } = Typography;
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { message } = App.useApp();
 
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);

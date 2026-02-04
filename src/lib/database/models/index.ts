@@ -3,6 +3,7 @@ import User from './user';
 import Role from './role';
 import Permission from './permission';
 import RolePermission from './rolePermission';
+import DataSource from './dataSource';
 
 Role.belongsToMany(Permission, { through: RolePermission, foreignKey: 'role_id', as: 'permissions' });
 Permission.belongsToMany(Role, { through: RolePermission, foreignKey: 'permission_id', as: 'roles' });
@@ -10,4 +11,4 @@ Permission.belongsToMany(Role, { through: RolePermission, foreignKey: 'permissio
 User.belongsTo(Role, { foreignKey: 'role_id', as: 'role' });
 Role.hasMany(User, { foreignKey: 'role_id', as: 'users' });
 
-export { sequelize, User, Role, Permission, RolePermission };
+export { sequelize, User, Role, Permission, RolePermission, DataSource };
