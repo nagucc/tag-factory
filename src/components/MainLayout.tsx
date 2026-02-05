@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Layout, Typography, Space, Button, Tag, App, Avatar, Dropdown } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { Layout, Typography, Space, Button, Tag, App, Avatar, Dropdown, Menu } from 'antd';
+import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined } from '@ant-design/icons';
+import { useRouter, usePathname } from 'next/navigation';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -27,6 +27,7 @@ interface MainLayoutProps {
 
 function MainLayout({ children, title }: MainLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +104,33 @@ function MainLayout({ children, title }: MainLayoutProps) {
     }
   };
 
+  const navMenuItems = [
+    {
+      key: '/',
+      icon: <TagOutlined />,
+      label: '首页',
+    },
+    {
+      key: '/data-sources',
+      icon: <DatabaseOutlined />,
+      label: '数据源',
+    },
+    {
+      key: '/tags',
+      icon: <TagOutlined />,
+      label: '标签管理',
+    },
+    {
+      key: '/system',
+      icon: <SettingOutlined />,
+      label: '系统设置',
+    },
+  ];
+
+  const handleNavClick = ({ key }: { key: string }) => {
+    router.push(key);
+  };
+
   if (loading) {
     return (
       <div style={{ 
@@ -131,18 +159,19 @@ function MainLayout({ children, title }: MainLayoutProps) {
         zIndex: 100,
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Title level={4} style={{ margin: '16px 0', color: '#1890ff', cursor: 'pointer' }} onClick={() => router.push('/')}>
+          <Title level={4} style={{ margin: '16px 0', color: '#1890ff', cursor: 'pointer', marginRight: 24 }} onClick={() => router.push('/')}>
             Tag Factory
           </Title>
-          {title && (
-            <Text style={{ marginLeft: 16, color: '#666' }}>| {title}</Text>
-          )}
+          <Menu
+            mode="horizontal"
+            selectedKeys={[pathname]}
+            items={navMenuItems}
+            onClick={handleNavClick}
+            style={{ borderBottom: 'none', minWidth: 400 }}
+          />
         </div>
         
         <Space size="large">
-          <Button type="link" onClick={() => router.push('/')}>
-            首页
-          </Button>
           <Dropdown 
             menu={{ 
               items: userMenuItems,
