@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Space, Button, Tag, App, Avatar, Dropdown, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
 const { Header, Content, Footer } = Layout;
@@ -114,6 +114,11 @@ function MainLayout({ children, title }: MainLayoutProps) {
       key: '/data-sources',
       icon: <DatabaseOutlined />,
       label: '数据源',
+    },
+    {
+      key: '/data-objects',
+      icon: <FileTextOutlined />,
+      label: '数据对象',
     },
     {
       key: '/tags',

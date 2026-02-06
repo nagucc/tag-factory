@@ -4,6 +4,12 @@ import Role from './models/role';
 import Permission from './models/permission';
 import RolePermission from './models/rolePermission';
 import DataSource from './models/dataSource';
+import DataObject from './models/dataObject';
+import DataRecord from './models/dataRecord';
+import TagApplication from './models/tagApplication';
+import Tag from './models/tag';
+import TagGroup from './models/tagGroup';
+import TagGroupRelation from './models/tagGroupRelation';
 import bcrypt from 'bcrypt';
 
 Role.belongsToMany(Permission, { through: RolePermission, foreignKey: 'role_id', as: 'permissions' });
