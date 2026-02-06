@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Space, Button, Tag, App, Avatar, Dropdown, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
 const { Header, Content, Footer } = Layout;
@@ -124,6 +124,16 @@ function MainLayout({ children, title }: MainLayoutProps) {
       key: '/tags',
       icon: <TagOutlined />,
       label: '标签管理',
+    },
+    {
+      key: '/work-plans',
+      icon: <ClockCircleOutlined />,
+      label: '工作计划',
+    },
+    {
+      key: '/tag-rules',
+      icon: <ClockCircleOutlined />,
+      label: '标签规则',
     },
     {
       key: '/system',

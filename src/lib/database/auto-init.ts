@@ -10,6 +10,11 @@ import TagApplication from './models/tagApplication';
 import Tag from './models/tag';
 import TagGroup from './models/tagGroup';
 import TagGroupRelation from './models/tagGroupRelation';
+import TagRule from './models/tagRule';
+import WorkPlan from './models/workPlan';
+import WorkPlanTag from './models/workPlanTag';
+import WorkPlanMember from './models/workPlanMember';
+import WorkPlanRecord from './models/workPlanRecord';
 import bcrypt from 'bcrypt';
 
 const TABLE_PREFIX = 'tagfactory_';
@@ -18,7 +23,7 @@ async function checkAndCreateTable(tableName: string): Promise<boolean> {
   try {
     const [results] = await sequelize.query(
       `SHOW TABLES LIKE '${TABLE_PREFIX}${tableName}'`
-    ) as any;
+    ) as any[];
     
     if (results.length === 0) {
       console.log(`表 ${TABLE_PREFIX}${tableName} 不存在，将创建...`);
@@ -58,6 +63,11 @@ async function initializeDatabase(): Promise<void> {
     await syncTable(TagGroup, 'tag_groups');
     await syncTable(TagGroupRelation, 'tag_group_relations');
     await syncTable(TagApplication, 'tag_applications');
+    await syncTable(TagRule, 'tag_rules');
+    await syncTable(WorkPlan, 'work_plans');
+    await syncTable(WorkPlanTag, 'work_plan_tags');
+    await syncTable(WorkPlanMember, 'work_plan_members');
+    await syncTable(WorkPlanRecord, 'work_plan_records');
 
     await sequelize.sync();
     console.log('数据库模型同步完成');
