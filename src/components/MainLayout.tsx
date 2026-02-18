@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Space, Button, Tag, App, Avatar, Dropdown, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined, ClockCircleOutlined, SearchOutlined, BarChartOutlined, AuditOutlined, TeamOutlined, MonitorOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined, ClockCircleOutlined, SearchOutlined, BarChartOutlined, AuditOutlined, TeamOutlined, MonitorOutlined, HomeOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
 const { Header, Content, Footer } = Layout;
@@ -106,9 +106,9 @@ function MainLayout({ children, title }: MainLayoutProps) {
 
   const navMenuItems = [
     {
-      key: '/',
-      icon: <TagOutlined />,
-      label: '首页',
+      key: '/dashboard',
+      icon: <HomeOutlined />,
+      label: '控制台',
     },
     {
       key: 'data',
@@ -175,7 +175,10 @@ function MainLayout({ children, title }: MainLayoutProps) {
   };
 
   const getSelectedKeys = () => {
-    const keys: string[] = [pathname];
+    const keys: string[] = [];
+    if (pathname === '/dashboard') {
+      keys.push('/dashboard');
+    }
     if (pathname.startsWith('/data-')) {
       keys.push('data');
     }
@@ -272,7 +275,7 @@ function MainLayout({ children, title }: MainLayoutProps) {
         zIndex: 100,
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Title level={4} style={{ margin: '16px 0', color: '#1890ff', cursor: 'pointer', marginRight: 24 }} onClick={() => router.push('/')}>
+          <Title level={4} style={{ margin: '16px 0', color: '#1890ff', cursor: 'pointer', marginRight: 24 }} onClick={() => router.push('/dashboard')}>
             Tag Factory
           </Title>
           <Menu
