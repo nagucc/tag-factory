@@ -82,6 +82,16 @@ export async function POST(
       tagged_at: new Date(),
     }, { transaction });
 
+    await TagApplication.create({
+      tag_id,
+      data_object_id: workPlanData.data_object_id,
+      record_id: record_id || null,
+      applied_by: user_id,
+      applied_at: new Date(),
+      source: 'workplan',
+      status: 'active',
+    }, { transaction });
+
     const memberData = member.toJSON() as any;
     await member.update({
       tagged_count: (memberData.tagged_count || 0) + 1,
@@ -152,6 +162,8 @@ export async function DELETE(
       );
     }
 
+    const workPlanData = workPlan.toJSON() as any;
+
     const workPlanRecord = await WorkPlanRecord.findOne({
       where: { work_plan_id: workPlanId, record_id: recordId },
     });
@@ -180,6 +192,15 @@ export async function DELETE(
       tagged_by: null,
       tagged_at: null,
     }, { transaction });
+
+    await TagApplication.destroy({
+      where: {
+        data_object_id: workPlanData.data_object_id,
+        record_id: recordId || null,
+        applied_by: previousTaggerId,
+      },
+      transaction,
+    });
 
     const member = await WorkPlanMember.findOne({
       where: { work_plan_id: workPlanId, user_id: previousTaggerId },

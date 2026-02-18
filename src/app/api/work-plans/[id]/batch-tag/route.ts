@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { WorkPlan, WorkPlanRecord, WorkPlanMember, Tag as TagModel } from '@/lib/database/models';
+import { WorkPlan, WorkPlanRecord, WorkPlanMember, Tag as TagModel, TagApplication } from '@/lib/database/models';
 import sequelize from '@/lib/database/mysql';
 
 export async function POST(
@@ -92,6 +92,16 @@ export async function POST(
         tag_id,
         tagged_by: user_id,
         tagged_at: new Date(),
+      }, { transaction });
+
+      await TagApplication.create({
+        tag_id,
+        data_object_id: workPlanData.data_object_id,
+        record_id: recordId || null,
+        applied_by: user_id,
+        applied_at: new Date(),
+        source: 'workplan',
+        status: 'active',
       }, { transaction });
 
       successCount++;

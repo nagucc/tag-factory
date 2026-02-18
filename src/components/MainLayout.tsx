@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Space, Button, Tag, App, Avatar, Dropdown, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined, ClockCircleOutlined, SearchOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
 const { Header, Content, Footer } = Layout;
@@ -121,9 +121,26 @@ function MainLayout({ children, title }: MainLayoutProps) {
       label: '数据对象',
     },
     {
-      key: '/tags',
+      key: 'tags',
       icon: <TagOutlined />,
       label: '标签管理',
+      children: [
+        {
+          key: '/tags',
+          icon: <TagOutlined />,
+          label: '标签列表',
+        },
+        {
+          key: '/tags/query',
+          icon: <SearchOutlined />,
+          label: '标签查询',
+        },
+        {
+          key: '/tags/analysis',
+          icon: <BarChartOutlined />,
+          label: '标签分析',
+        },
+      ],
     },
     {
       key: '/work-plans',
@@ -143,7 +160,17 @@ function MainLayout({ children, title }: MainLayoutProps) {
   ];
 
   const handleNavClick = ({ key }: { key: string }) => {
-    router.push(key);
+    if (key.startsWith('/')) {
+      router.push(key);
+    }
+  };
+
+  const getSelectedKeys = () => {
+    const keys: string[] = [pathname];
+    if (pathname.startsWith('/tags/')) {
+      keys.push('/tags');
+    }
+    return keys;
   };
 
   if (loading) {
@@ -179,7 +206,7 @@ function MainLayout({ children, title }: MainLayoutProps) {
           </Title>
           <Menu
             mode="horizontal"
-            selectedKeys={[pathname]}
+            selectedKeys={getSelectedKeys()}
             items={navMenuItems}
             onClick={handleNavClick}
             style={{ borderBottom: 'none', minWidth: 400 }}

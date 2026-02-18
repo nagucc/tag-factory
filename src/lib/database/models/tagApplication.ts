@@ -34,10 +34,10 @@ const TagApplication = sequelize.define('TagApplication', {
     comment: '应用时间',
   },
   source: {
-    type: DataTypes.ENUM('manual', 'auto', 'import'),
+    type: DataTypes.ENUM('manual', 'auto', 'import', 'workplan'),
     allowNull: false,
     defaultValue: 'manual',
-    comment: '来源：manual/auto/import',
+    comment: '来源：manual/auto/import/workplan',
   },
   status: {
     type: DataTypes.ENUM('active', 'removed'),
