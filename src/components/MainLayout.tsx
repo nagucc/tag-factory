@@ -99,8 +99,8 @@ function MainLayout({ children, title }: MainLayoutProps) {
       handleLogout();
     } else if (key === 'profile') {
       message.info('个人中心功能开发中');
-    } else if (key === 'settings') {
-      router.push('/system');
+    } else if (key.startsWith('/')) {
+      router.push(key);
     }
   };
 
@@ -111,14 +111,21 @@ function MainLayout({ children, title }: MainLayoutProps) {
       label: '首页',
     },
     {
-      key: '/data-sources',
+      key: 'data',
       icon: <DatabaseOutlined />,
-      label: '数据源',
-    },
-    {
-      key: '/data-objects',
-      icon: <FileTextOutlined />,
-      label: '数据对象',
+      label: '数据管理',
+      children: [
+        {
+          key: '/data-sources',
+          icon: <DatabaseOutlined />,
+          label: '数据源',
+        },
+        {
+          key: '/data-objects',
+          icon: <FileTextOutlined />,
+          label: '数据对象',
+        },
+      ],
     },
     {
       key: 'tags',
@@ -143,34 +150,21 @@ function MainLayout({ children, title }: MainLayoutProps) {
       ],
     },
     {
-      key: '/work-plans',
+      key: 'work',
       icon: <ClockCircleOutlined />,
-      label: '工作计划',
-    },
-    {
-      key: '/tag-rules',
-      icon: <ClockCircleOutlined />,
-      label: '标签规则',
-    },
-    {
-      key: '/roles',
-      icon: <TeamOutlined />,
-      label: '角色管理',
-    },
-    {
-      key: '/audit-logs',
-      icon: <AuditOutlined />,
-      label: '审计日志',
-    },
-    {
-      key: '/monitoring',
-      icon: <MonitorOutlined />,
-      label: '系统监控',
-    },
-    {
-      key: '/system',
-      icon: <SettingOutlined />,
-      label: '系统设置',
+      label: '工作管理',
+      children: [
+        {
+          key: '/work-plans',
+          icon: <ClockCircleOutlined />,
+          label: '工作计划',
+        },
+        {
+          key: '/tag-rules',
+          icon: <ClockCircleOutlined />,
+          label: '标签规则',
+        },
+      ],
     },
   ];
 
@@ -182,10 +176,72 @@ function MainLayout({ children, title }: MainLayoutProps) {
 
   const getSelectedKeys = () => {
     const keys: string[] = [pathname];
+    if (pathname.startsWith('/data-')) {
+      keys.push('data');
+    }
     if (pathname.startsWith('/tags/')) {
-      keys.push('/tags');
+      keys.push('tags');
+    }
+    if (pathname.startsWith('/work-') || pathname.startsWith('/tag-rules')) {
+      keys.push('work');
     }
     return keys;
+  };
+
+  const isAdmin = userInfo?.role === 'admin';
+
+  const getUserMenuItems = () => {
+    const items = [
+      {
+        key: 'profile',
+        icon: <UserOutlined />,
+        label: '个人中心',
+      },
+    ];
+
+    if (isAdmin) {
+      items.push({
+        key: 'system-management',
+        icon: <SettingOutlined />,
+        label: '系统管理',
+        children: [
+          {
+            key: '/roles',
+            icon: <TeamOutlined />,
+            label: '角色管理',
+          },
+          {
+            key: '/audit-logs',
+            icon: <AuditOutlined />,
+            label: '审计日志',
+          },
+          {
+            key: '/monitoring',
+            icon: <MonitorOutlined />,
+            label: '系统监控',
+          },
+          {
+            key: '/system',
+            icon: <SettingOutlined />,
+            label: '系统设置',
+          },
+        ],
+      } as any);
+    }
+
+    items.push(
+      {
+        type: 'divider' as const,
+      },
+      {
+        key: 'logout',
+        icon: <LogoutOutlined />,
+        label: '退出登录',
+        danger: true,
+      }
+    );
+
+    return items;
   };
 
   if (loading) {
@@ -231,7 +287,7 @@ function MainLayout({ children, title }: MainLayoutProps) {
         <Space size="large">
           <Dropdown 
             menu={{ 
-              items: userMenuItems,
+              items: getUserMenuItems(),
               onClick: handleUserMenuClick
             }}
             placement="bottomRight"
