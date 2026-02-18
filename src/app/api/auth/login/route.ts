@@ -8,6 +8,7 @@ import {
   resetLoginAttempts
 } from '@/lib/auth';
 import { QueryTypes } from 'sequelize';
+import { createAuditLog, getClientIp, getUserAgent } from '@/lib/audit';
 
 export const runtime = 'nodejs';
 
@@ -47,6 +48,15 @@ export async function POST(request: NextRequest) {
     const user = users[0];
 
     if (!user) {
+      await createAuditLog({
+        username,
+        action: 'login',
+        resource_type: 'auth',
+        status: 0,
+        ip_address: getClientIp(request),
+        user_agent: getUserAgent(request),
+        details: { reason: 'user_not_found' },
+      });
       return NextResponse.json(
         { success: false, message: '用户名或密码错误' },
         { status: 401 }
@@ -54,6 +64,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (user.status === 0) {
+      await createAuditLog({
+        user_id: user.id,
+        username: user.username,
+        action: 'login',
+        resource_type: 'auth',
+        status: 0,
+        ip_address: getClientIp(request),
+        user_agent: getUserAgent(request),
+        details: { reason: 'account_disabled' },
+      });
       return NextResponse.json(
         { success: false, message: '账户已被禁用，请联系管理员' },
         { status: 403 }
@@ -62,6 +82,16 @@ export async function POST(request: NextRequest) {
 
     if (user.locked_until && new Date(user.locked_until) > new Date()) {
       const remainingTime = Math.ceil((new Date(user.locked_until).getTime() - Date.now()) / 1000 / 60);
+      await createAuditLog({
+        user_id: user.id,
+        username: user.username,
+        action: 'login',
+        resource_type: 'auth',
+        status: 0,
+        ip_address: getClientIp(request),
+        user_agent: getUserAgent(request),
+        details: { reason: 'account_locked', remaining_minutes: remainingTime },
+      });
       return NextResponse.json(
         { 
           success: false, 
@@ -95,6 +125,16 @@ export async function POST(request: NextRequest) {
           }
         );
       }
+      await createAuditLog({
+        user_id: user.id,
+        username: user.username,
+        action: 'login',
+        resource_type: 'auth',
+        status: 0,
+        ip_address: getClientIp(request),
+        user_agent: getUserAgent(request),
+        details: { reason: 'invalid_password', attempts },
+      });
       return NextResponse.json(
         { success: false, message: '用户名或密码错误' },
         { status: 401 }
@@ -173,6 +213,17 @@ export async function POST(request: NextRequest) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
+    });
+
+    await createAuditLog({
+      user_id: user.id,
+      username: user.username,
+      action: 'login',
+      resource_type: 'auth',
+      status: 1,
+      ip_address: getClientIp(request),
+      user_agent: getUserAgent(request),
+      details: { role: role?.name },
     });
 
     return response;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, Form, Input, Button, Select, Typography, message, Divider, Space } from 'antd';
+import { Card, Form, Input, Button, Select, Typography, App, Divider, Space } from 'antd';
 import { SaveOutlined, SecurityScanOutlined, GlobalOutlined, UserOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/MainLayout';
 
@@ -17,6 +17,7 @@ interface SystemConfig {
 }
 
 export default function SystemConfigPage() {
+  const { message } = App.useApp();
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
 

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Space, Button, Tag, App, Avatar, Dropdown, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined, ClockCircleOutlined, SearchOutlined, BarChartOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, SettingOutlined, DownOutlined, DatabaseOutlined, TagOutlined, FileTextOutlined, ClockCircleOutlined, SearchOutlined, BarChartOutlined, AuditOutlined, TeamOutlined, MonitorOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
 const { Header, Content, Footer } = Layout;
@@ -151,6 +151,21 @@ function MainLayout({ children, title }: MainLayoutProps) {
       key: '/tag-rules',
       icon: <ClockCircleOutlined />,
       label: '标签规则',
+    },
+    {
+      key: '/roles',
+      icon: <TeamOutlined />,
+      label: '角色管理',
+    },
+    {
+      key: '/audit-logs',
+      icon: <AuditOutlined />,
+      label: '审计日志',
+    },
+    {
+      key: '/monitoring',
+      icon: <MonitorOutlined />,
+      label: '系统监控',
     },
     {
       key: '/system',

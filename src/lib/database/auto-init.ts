@@ -15,6 +15,8 @@ import WorkPlan from './models/workPlan';
 import WorkPlanTag from './models/workPlanTag';
 import WorkPlanMember from './models/workPlanMember';
 import WorkPlanRecord from './models/workPlanRecord';
+import AuditLog from './models/auditLog';
+import SystemConfig from './models/systemConfig';
 import bcrypt from 'bcrypt';
 
 const TABLE_PREFIX = 'tagfactory_';
@@ -68,6 +70,8 @@ async function initializeDatabase(): Promise<void> {
     await syncTable(WorkPlanTag, 'work_plan_tags');
     await syncTable(WorkPlanMember, 'work_plan_members');
     await syncTable(WorkPlanRecord, 'work_plan_records');
+    await syncTable(AuditLog, 'audit_logs');
+    await syncTable(SystemConfig, 'system_configs');
 
     await sequelize.sync();
     console.log('数据库模型同步完成');
