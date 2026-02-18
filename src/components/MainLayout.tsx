@@ -209,6 +209,16 @@ function MainLayout({ children, title }: MainLayoutProps) {
         label: '系统管理',
         children: [
           {
+            key: '/users',
+            icon: <UserOutlined />,
+            label: '用户管理',
+          },
+          {
+            key: '/users/login-logs',
+            icon: <AuditOutlined />,
+            label: '登录日志',
+          },
+          {
             key: '/roles',
             icon: <TeamOutlined />,
             label: '角色管理',
@@ -216,7 +226,7 @@ function MainLayout({ children, title }: MainLayoutProps) {
           {
             key: '/audit-logs',
             icon: <AuditOutlined />,
-            label: '审计日志',
+            label: '操作日志',
           },
           {
             key: '/monitoring',

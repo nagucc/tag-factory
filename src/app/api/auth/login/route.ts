@@ -9,6 +9,7 @@ import {
 } from '@/lib/auth';
 import { QueryTypes } from 'sequelize';
 import { createAuditLog, getClientIp, getUserAgent } from '@/lib/audit';
+import { LoginLog } from '@/lib/database/models';
 
 export const runtime = 'nodejs';
 
@@ -63,6 +64,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ipAddress = getClientIp(request);
+    const userAgent = getUserAgent(request);
+
     if (user.status === 0) {
       await createAuditLog({
         user_id: user.id,
@@ -70,8 +74,8 @@ export async function POST(request: NextRequest) {
         action: 'login',
         resource_type: 'auth',
         status: 0,
-        ip_address: getClientIp(request),
-        user_agent: getUserAgent(request),
+        ip_address: ipAddress,
+        user_agent: userAgent,
         details: { reason: 'account_disabled' },
       });
       return NextResponse.json(
@@ -88,8 +92,8 @@ export async function POST(request: NextRequest) {
         action: 'login',
         resource_type: 'auth',
         status: 0,
-        ip_address: getClientIp(request),
-        user_agent: getUserAgent(request),
+        ip_address: ipAddress,
+        user_agent: userAgent,
         details: { reason: 'account_locked', remaining_minutes: remainingTime },
       });
       return NextResponse.json(
@@ -131,8 +135,8 @@ export async function POST(request: NextRequest) {
         action: 'login',
         resource_type: 'auth',
         status: 0,
-        ip_address: getClientIp(request),
-        user_agent: getUserAgent(request),
+        ip_address: ipAddress,
+        user_agent: userAgent,
         details: { reason: 'invalid_password', attempts },
       });
       return NextResponse.json(
@@ -148,6 +152,14 @@ export async function POST(request: NextRequest) {
         type: QueryTypes.UPDATE
       }
     );
+
+    await LoginLog.create({
+      user_id: user.id,
+      username: user.username,
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      status: 1,
+    });
 
     interface RoleResult {
       id: number;
@@ -221,8 +233,8 @@ export async function POST(request: NextRequest) {
       action: 'login',
       resource_type: 'auth',
       status: 1,
-      ip_address: getClientIp(request),
-      user_agent: getUserAgent(request),
+      ip_address: ipAddress,
+      user_agent: userAgent,
       details: { role: role?.name },
     });
 

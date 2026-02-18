@@ -17,6 +17,7 @@ import WorkPlanMember from './workPlanMember';
 import WorkPlanRecord from './workPlanRecord';
 import AuditLog from './auditLog';
 import SystemConfig from './systemConfig';
+import LoginLog from './loginLog';
 
 Role.belongsToMany(Permission, { through: RolePermission, foreignKey: 'role_id', as: 'permissions' });
 Permission.belongsToMany(Role, { through: RolePermission, foreignKey: 'permission_id', as: 'roles' });
@@ -84,6 +85,9 @@ WorkPlanRecord.belongsTo(Tag, { foreignKey: 'tag_id', as: 'tag' });
 User.hasMany(AuditLog, { foreignKey: 'user_id', as: 'auditLogs' });
 AuditLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+User.hasMany(LoginLog, { foreignKey: 'user_id', as: 'loginLogs' });
+LoginLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
 export { 
   sequelize, 
   User, 
@@ -103,5 +107,6 @@ export {
   WorkPlanMember,
   WorkPlanRecord,
   AuditLog,
-  SystemConfig
+  SystemConfig,
+  LoginLog
 };

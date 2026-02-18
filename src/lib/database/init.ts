@@ -12,6 +12,7 @@ import TagGroup from './models/tagGroup';
 import TagGroupRelation from './models/tagGroupRelation';
 import AuditLog from './models/auditLog';
 import SystemConfig from './models/systemConfig';
+import LoginLog from './models/loginLog';
 import bcrypt from 'bcrypt';
 
 Role.belongsToMany(Permission, { through: RolePermission, foreignKey: 'role_id', as: 'permissions' });
