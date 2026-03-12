@@ -39,6 +39,9 @@ DataObject.belongsTo(DataSource, { foreignKey: 'data_source_id', as: 'dataSource
 User.hasMany(DataSource, { foreignKey: 'created_by', as: 'createdDataSources' });
 DataSource.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
 
+User.hasMany(DataObject, { foreignKey: 'created_by', as: 'createdDataObjects' });
+DataObject.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+
 DataObject.hasMany(DataRecord, { foreignKey: 'data_object_id', as: 'records' });
 DataRecord.belongsTo(DataObject, { foreignKey: 'data_object_id', as: 'dataObject' });
 

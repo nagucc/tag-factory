@@ -97,7 +97,21 @@ export async function GET(
     const sortField = searchParams.get('sortField') || '_synced_at';
     const sortOrder = searchParams.get('sortOrder') || 'DESC';
 
-    const dataObject = await DataObject.findByPk(numericId) as DataObjectInstance | null;
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataObject = await DataObject.findOne({
+      where: {
+        id: numericId,
+        created_by: parseInt(userId),
+      },
+    }) as DataObjectInstance | null;
+
     if (!dataObject) {
       return NextResponse.json(
         { success: false, message: '数据对象不存在' },
@@ -206,7 +220,20 @@ export async function POST(
     const body: SyncRequestBody = await request.json();
     const syncStrategy = body.syncStrategy || 'full';
 
-    const dataObject = await DataObject.findByPk(numericId, {
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      await transaction.rollback();
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataObject = await DataObject.findOne({
+      where: {
+        id: numericId,
+        created_by: parseInt(userId),
+      },
       include: [
         {
           model: DataSource,

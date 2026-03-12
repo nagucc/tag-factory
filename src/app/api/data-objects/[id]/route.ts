@@ -11,7 +11,21 @@ export async function GET(
     const { id } = await params;
     const numericId = parseInt(id, 10);
 
-    const dataObjectRaw = await DataObject.findByPk(numericId);
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataObjectRaw = await DataObject.findOne({
+      where: {
+        id: numericId,
+        created_by: parseInt(userId),
+      },
+    });
+
     if (!dataObjectRaw) {
       return NextResponse.json(
         { success: false, message: '数据对象不存在' },
@@ -94,7 +108,21 @@ export async function PUT(
     const numericId = parseInt(id, 10);
     const body: UpdateDataObjectBody = await request.json();
 
-    const dataObjectRaw = await DataObject.findByPk(numericId) as any;
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataObjectRaw = await DataObject.findOne({
+      where: {
+        id: numericId,
+        created_by: parseInt(userId),
+      },
+    }) as any;
+
     if (!dataObjectRaw) {
       return NextResponse.json(
         { success: false, message: '数据对象不存在' },
@@ -136,7 +164,21 @@ export async function DELETE(
     const { id } = await params;
     const numericId = parseInt(id, 10);
 
-    const dataObject = await DataObject.findByPk(numericId);
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataObject = await DataObject.findOne({
+      where: {
+        id: numericId,
+        created_by: parseInt(userId),
+      },
+    });
+
     if (!dataObject) {
       return NextResponse.json(
         { success: false, message: '数据对象不存在' },

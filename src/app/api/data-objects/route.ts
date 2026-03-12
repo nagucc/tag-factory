@@ -17,6 +17,7 @@ interface DataObjectAttributes {
   last_sync_status?: string;
   sync_count: number;
   status: string;
+  created_by: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -25,27 +26,6 @@ interface DataSourceAttributes {
   id: number;
   name: string;
   type: string;
-}
-
-interface DataObjectInstance {
-  id: number;
-  name: string;
-  description?: string;
-  data_source_id: number;
-  dataSource?: DataSourceAttributes;
-  query_statement: string;
-  primary_key: string;
-  display_template: string;
-  sync_enabled: boolean;
-  sync_cron?: string;
-  sync_strategy: string;
-  last_sync_at?: Date;
-  last_sync_status?: string;
-  sync_count: number;
-  status: string;
-  created_at: Date;
-  updated_at: Date;
-  toJSON(): DataObjectAttributes;
 }
 
 interface DataObjectListItem {
@@ -80,7 +60,17 @@ export async function GET(request: NextRequest) {
     const dataSourceId = searchParams.get('dataSourceId');
     const status = searchParams.get('status');
 
-    const where: WhereOptions<DataObjectAttributes> = {};
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const where: WhereOptions<DataObjectAttributes> = {
+      created_by: parseInt(userId),
+    };
     if (name) {
       where.name = { [Symbol.for('sequelize.op')]: 'LIKE', value: `%${name}%` };
     }
@@ -161,7 +151,6 @@ interface CreateDataObjectBody {
   sync_enabled?: boolean;
   sync_cron?: string;
   sync_strategy?: string;
-  created_by?: number;
 }
 
 export async function POST(request: NextRequest) {
@@ -177,8 +166,15 @@ export async function POST(request: NextRequest) {
       sync_enabled,
       sync_cron,
       sync_strategy,
-      created_by,
     } = body;
+
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
 
     if (!name || !data_source_id || !query_statement || !primary_key) {
       return NextResponse.json(
@@ -206,7 +202,7 @@ export async function POST(request: NextRequest) {
       sync_cron: sync_cron || null,
       sync_strategy: sync_strategy || 'full',
       status: 'active',
-      created_by: created_by || 1,
+      created_by: parseInt(userId),
     });
 
     const jsonData = dataObject.toJSON();
