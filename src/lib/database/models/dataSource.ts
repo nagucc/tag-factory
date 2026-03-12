@@ -63,6 +63,11 @@ const DataSource = sequelize.define('DataSource', {
     allowNull: true,
     comment: '额外配置选项',
   },
+  created_by: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: '创建人ID',
+  },
 }, {
   tableName: 'tagfactory_data_sources',
   modelName: 'DataSource',

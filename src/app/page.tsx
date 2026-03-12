@@ -124,20 +124,9 @@ export default function LandingPage() {
             <a href="#advantages">产品优势</a>
           </nav>
           <div className="header-actions">
-            {userStatus === 'logged_in' ? (
-              <Button type="primary" size="large" icon={<RocketOutlined />} onClick={handleGoToDashboard}>
-                进入控制台
-              </Button>
-            ) : (
-              <>
-                <Button size="large" onClick={handleLogin}>
-                  登录
-                </Button>
-                <Button type="primary" size="large" icon={<RocketOutlined />} onClick={handleGoToDashboard}>
-                  立即体验
-                </Button>
-              </>
-            )}
+            <Button type="primary" size="large" icon={<RocketOutlined />} onClick={handleGoToDashboard}>
+              进入控制台
+            </Button>
           </div>
         </div>
       </header>
@@ -153,7 +142,7 @@ export default function LandingPage() {
           </Paragraph>
           <Space size="large" className="hero-actions">
             <Button type="primary" size="large" icon={<RocketOutlined />} onClick={handleGoToDashboard} className="hero-btn-primary">
-              免费试用
+              进入控制台
             </Button>
             <Button size="large" icon={<ArrowRightOutlined />} onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}>
               了解更多
@@ -236,11 +225,11 @@ export default function LandingPage() {
                   <Button 
                     type="primary" 
                     size="large" 
-                    icon={<LoginOutlined />} 
+                    icon={<RocketOutlined />} 
                     onClick={handleGoToDashboard}
                     className="advantage-btn"
                   >
-                    立即体验
+                    进入控制台
                   </Button>
                 </div>
               </Card>
@@ -256,11 +245,8 @@ export default function LandingPage() {
             立即体验 Tag Factory，让数据标签管理变得简单高效
           </Paragraph>
           <Space size="large">
-            <Button size="large" icon={<RocketOutlined />} onClick={handleGoToDashboard} className="cta-btn">
-              免费试用
-            </Button>
-            <Button size="large" onClick={handleLogin} className="cta-btn-secondary">
-              账号登录
+            <Button type="primary" size="large" icon={<RocketOutlined />} onClick={handleGoToDashboard} className="cta-btn">
+              进入控制台
             </Button>
           </Space>
         </div>

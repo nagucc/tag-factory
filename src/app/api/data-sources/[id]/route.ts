@@ -9,7 +9,20 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const dataSource = await DataSource.findByPk(id) as any;
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataSource = await DataSource.findOne({
+      where: {
+        id: parseInt(id),
+        created_by: parseInt(userId),
+      },
+    }) as any;
 
     if (!dataSource) {
       return NextResponse.json(
@@ -54,7 +67,21 @@ export async function PUT(
     const body = await request.json();
     const { name, type, host, port, database, username, password, description, options, status } = body;
 
-    const dataSource = await DataSource.findByPk(id) as any;
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataSource = await DataSource.findOne({
+      where: {
+        id: parseInt(id),
+        created_by: parseInt(userId),
+      },
+    }) as any;
+
     if (!dataSource) {
       return NextResponse.json(
         { success: false, message: '数据源不存在' },
@@ -106,7 +133,20 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const dataSource = await DataSource.findByPk(id) as any;
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const dataSource = await DataSource.findOne({
+      where: {
+        id: parseInt(id),
+        created_by: parseInt(userId),
+      },
+    }) as any;
 
     if (!dataSource) {
       return NextResponse.json(

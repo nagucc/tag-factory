@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DataSource } from '@/lib/database/models';
 import syncService from '@/lib/sync/dataSync';
-import { Model } from 'sequelize';
 
 interface DataSourceAttributes {
   id: number;
@@ -36,6 +35,14 @@ export async function POST(
     const body: PreviewQueryBody = await request.json();
     const { query_statement } = body;
 
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
     if (!query_statement) {
       return NextResponse.json(
         { success: false, message: '查询语句不能为空' },
@@ -43,7 +50,13 @@ export async function POST(
       );
     }
 
-    const dataSource = await DataSource.findByPk(numericId);
+    const dataSource = await DataSource.findOne({
+      where: {
+        id: numericId,
+        created_by: parseInt(userId),
+      },
+    });
+
     if (!dataSource) {
       return NextResponse.json(
         { success: false, message: '数据源不存在' },

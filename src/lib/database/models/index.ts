@@ -36,6 +36,9 @@ TagGroup.hasMany(TagGroup, { foreignKey: 'parent_id', as: 'children' });
 DataSource.hasMany(DataObject, { foreignKey: 'data_source_id', as: 'dataObjects' });
 DataObject.belongsTo(DataSource, { foreignKey: 'data_source_id', as: 'dataSource' });
 
+User.hasMany(DataSource, { foreignKey: 'created_by', as: 'createdDataSources' });
+DataSource.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+
 DataObject.hasMany(DataRecord, { foreignKey: 'data_object_id', as: 'records' });
 DataRecord.belongsTo(DataObject, { foreignKey: 'data_object_id', as: 'dataObject' });
 

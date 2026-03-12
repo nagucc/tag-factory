@@ -292,14 +292,14 @@ export default function DashboardPage() {
                 <Statistic
                   title="待处理任务"
                   value={stats.pendingTasks}
-                  valueStyle={{ color: '#faad14' }}
+                  styles={{ content: { color: '#faad14' } }}
                 />
               </Col>
               <Col span={12}>
                 <Statistic
                   title="今日应用次数"
                   value={stats.appliedToday}
-                  valueStyle={{ color: '#52c41a' }}
+                  styles={{ content: { color: '#52c41a' } }}
                 />
               </Col>
             </Row>

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DataSource } from '@/lib/database/models';
-import { QueryTypes } from 'sequelize';
-import sequelize from '@/lib/database/mysql';
 
 export const runtime = 'nodejs';
 
@@ -14,7 +12,17 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type');
     const status = searchParams.get('status');
 
-    const where: any = {};
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
+    const where: any = {
+      created_by: parseInt(userId),
+    };
     if (name) {
       where.name = { [Symbol.for('sequelize.op')]: 'LIKE', ...{}, value: `%${name}%` };
     }
@@ -70,6 +78,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, type, host, port, database, username, password, description, options } = body;
 
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: '未认证' },
+        { status: 401 }
+      );
+    }
+
     if (!name || !type || !host || !port || !database || !username || !password) {
       return NextResponse.json(
         { success: false, message: '缺少必要参数' },
@@ -88,6 +104,7 @@ export async function POST(request: NextRequest) {
       description,
       options,
       status: 1,
+      created_by: parseInt(userId),
     }) as any;
 
     return NextResponse.json({
