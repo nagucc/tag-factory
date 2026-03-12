@@ -32,6 +32,17 @@ const User = sequelize.define('User', {
     defaultValue: 1,
     comment: '0: 禁用, 1: 启用',
   },
+  auth_type: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    defaultValue: 'local',
+    comment: '认证类型: local/ldap/oauth/cas',
+  },
+  auth_id: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    comment: '外部认证系统用户ID',
+  },
   failed_login_attempts: {
     type: DataTypes.TINYINT,
     allowNull: false,

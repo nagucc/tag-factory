@@ -18,6 +18,8 @@ import WorkPlanRecord from './models/workPlanRecord';
 import AuditLog from './models/auditLog';
 import SystemConfig from './models/systemConfig';
 import LoginLog from './models/loginLog';
+import AITagTask from './models/aiTagTask';
+import PromptTemplate from './models/promptTemplate';
 import bcrypt from 'bcrypt';
 
 const TABLE_PREFIX = 'tagfactory_';
@@ -74,6 +76,8 @@ async function initializeDatabase(): Promise<void> {
     await syncTable(AuditLog, 'audit_logs');
     await syncTable(SystemConfig, 'system_configs');
     await syncTable(LoginLog, 'login_logs');
+    await syncTable(AITagTask, 'ai_tag_tasks');
+    await syncTable(PromptTemplate, 'prompt_templates');
 
     await sequelize.sync();
     console.log('数据库模型同步完成');

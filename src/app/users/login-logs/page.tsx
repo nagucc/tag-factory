@@ -53,7 +53,7 @@ export default function LoginLogsPage() {
   };
 
   const handleSearch = (values: { username?: string; status?: string }) => {
-    setSearchParams(values);
+    setSearchParams({ username: values.username || '', status: values.status || '' });
     setPagination({ ...pagination, current: 1 });
     fetchLogs();
   };

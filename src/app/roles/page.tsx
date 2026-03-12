@@ -383,7 +383,7 @@ export default function RolesPage() {
           dataSource={allPermissions}
           titles={['可选权限', '已选权限']}
           targetKeys={selectedPermissions}
-          onChange={setSelectedPermissions}
+          onChange={(keys) => setSelectedPermissions(keys as string[])}
           render={item => item.title}
           listStyle={{ width: 280, height: 400 }}
           showSearch

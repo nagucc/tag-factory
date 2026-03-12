@@ -80,7 +80,11 @@ export default function UsersPage() {
   };
 
   const handleSearch = (values: { username?: string; status?: string; role_id?: string }) => {
-    setSearchParams(values);
+    setSearchParams({
+      username: values.username || '',
+      status: values.status || '',
+      role_id: values.role_id || ''
+    });
     setPagination({ ...pagination, current: 1 });
     fetchUsers();
   };

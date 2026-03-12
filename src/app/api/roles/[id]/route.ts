@@ -105,7 +105,7 @@ export async function DELETE(
       );
     }
 
-    const roleData = role.toJSON();
+    const roleData = role.toJSON() as any;
     if (roleData.users && roleData.users.length > 0) {
       return NextResponse.json(
         { success: false, message: '该角色下有用户，无法删除' },

@@ -26,7 +26,7 @@ export async function GET(
       attributes: ['id', 'name', 'resource', 'action', 'description'],
     });
 
-    const rolePermissions = role.toJSON().permissions || [];
+    const rolePermissions = (role.toJSON() as any).permissions || [];
     const rolePermissionIds = rolePermissions.map((p: any) => p.id);
 
     const groupedPermissions: Record<string, Permission[]> = {};

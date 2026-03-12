@@ -5,12 +5,13 @@ import { useRouter, useParams } from 'next/navigation';
 import {
   Card, Table, Button, Space, Tag, Typography, Row, Col,
   App, message, Progress, Drawer, Descriptions, Tabs, List,
-  Checkbox, Popconfirm, Badge, Tooltip, Statistic, Spin, Avatar, Modal
+  Checkbox, Popconfirm, Badge, Tooltip, Statistic, Spin, Avatar, Modal,
+  InputNumber, Select, Empty, Divider, Input
 } from 'antd';
 import {
   ArrowLeftOutlined, ReloadOutlined, CheckCircleOutlined,
   ClockCircleOutlined, TagsOutlined, UserOutlined,
-  SyncOutlined, UndoOutlined, EyeOutlined
+  SyncOutlined, UndoOutlined, EyeOutlined, RobotOutlined
 } from '@ant-design/icons';
 import MainLayout from '@/components/MainLayout';
 import { renderTemplate } from '@/lib/utils/displayTemplate';
@@ -86,6 +87,14 @@ export default function WorkPlanTasksPage() {
   const [currentRecord, setCurrentRecord] = useState<WorkPlanRecord | null>(null);
   const { message: msg } = App.useApp();
   const [activeTab, setActiveTab] = useState('pending');
+
+  const [aiTagModalVisible, setAiTagModalVisible] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiPageSize, setAiPageSize] = useState(50);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiPreviewResults, setAiPreviewResults] = useState<any[]>([]);
+  const [aiPreviewLoading, setAiPreviewLoading] = useState(false);
+  const [tagDistribution, setTagDistribution] = useState<Record<number, number>>({});
 
   const workPlanId = params?.id as string;
 
@@ -344,6 +353,78 @@ export default function WorkPlanTasksPage() {
       msg.error('批量打标失败');
     } finally {
       setBatchTagging(false);
+    }
+  };
+
+  const handleAIPreview = async () => {
+    if (!workPlanId || !aiPrompt) {
+      msg.warning('请输入打标提示词');
+      return;
+    }
+
+    setAiPreviewLoading(true);
+    setAiPreviewResults([]);
+    setTagDistribution({});
+    try {
+      const response = await fetch(`/api/work-plans/${workPlanId}/ai-tag-preview`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: aiPrompt,
+          page_size: aiPageSize,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setAiPreviewResults(data.data.recommendations || []);
+        setTagDistribution(data.data.tag_distribution || {});
+        msg.success(`AI分析完成，共 ${data.data.total} 条记录，分 ${data.data.batches} 批处理`);
+      } else {
+        msg.error(data.message || 'AI打标预览失败');
+      }
+    } catch {
+      msg.error('AI打标预览失败');
+    } finally {
+      setAiPreviewLoading(false);
+    }
+  };
+
+  const handleAIExecute = async () => {
+    if (!workPlanId || !userInfo || aiPreviewResults.length === 0) {
+      msg.warning('请先进行AI打标预览');
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const response = await fetch(`/api/work-plans/${workPlanId}/ai-tag-execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: aiPrompt,
+          page_size: aiPageSize,
+          preview_results: aiPreviewResults,
+          user_id: userInfo.id,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        msg.success(data.message || 'AI批量打标完成');
+        setAiTagModalVisible(false);
+        setAiPrompt('');
+        setAiPreviewResults([]);
+        setTagDistribution({});
+        fetchPendingRecords();
+        fetchTaggedRecords();
+        fetchSkippedRecords();
+        fetchMembers();
+      } else {
+        msg.error(data.message || 'AI批量打标执行失败');
+      }
+    } catch {
+      msg.error('AI批量打标执行失败');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -679,6 +760,12 @@ export default function WorkPlanTasksPage() {
           <Col>
             <Space>
               <Button
+                icon={<RobotOutlined />}
+                onClick={() => setAiTagModalVisible(true)}
+              >
+                AI批量打标
+              </Button>
+              <Button
                 icon={<SyncOutlined />}
                 onClick={syncRecords}
                 loading={loading}
@@ -772,6 +859,147 @@ export default function WorkPlanTasksPage() {
             </Button>
           ))}
         </Space>
+      </Modal>
+
+      <Modal
+        title={<><RobotOutlined /> AI智能批量打标</>}
+        open={aiTagModalVisible}
+        onCancel={() => {
+          setAiTagModalVisible(false);
+          setAiPrompt('');
+          setAiPreviewResults([]);
+          setTagDistribution({});
+        }}
+        width={900}
+        footer={null}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 16 }}>
+            <Text strong>打标提示词：</Text>
+            <Input.TextArea
+              rows={4}
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="请输入打标提示词，例如：根据用户的消费金额进行分类，高于1000为VIP客户，低于100为普通客户"
+              style={{ marginTop: 8 }}
+            />
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <Text strong>每页记录数：</Text>
+            <InputNumber
+              min={10}
+              max={100}
+              value={aiPageSize}
+              onChange={(value) => setAiPageSize(value || 50)}
+              style={{ marginLeft: 8, width: 120 }}
+            />
+            <Text type="secondary" style={{ marginLeft: 8 }}>（建议10-100条）</Text>
+          </div>
+          <Space>
+            <Button
+              type="primary"
+              onClick={handleAIPreview}
+              loading={aiPreviewLoading}
+              icon={<RobotOutlined />}
+            >
+              AI预览
+            </Button>
+            <Button
+              onClick={() => {
+                setAiTagModalVisible(false);
+                setAiPrompt('');
+                setAiPreviewResults([]);
+                setTagDistribution({});
+              }}
+            >
+              取消
+            </Button>
+          </Space>
+        </div>
+
+        {aiPreviewResults.length > 0 && (
+          <>
+            <Divider>AI推荐结果</Divider>
+            <div style={{ marginBottom: 16 }}>
+              <Text>标签分布：</Text>
+              <Space wrap style={{ marginTop: 8 }}>
+                {Object.entries(tagDistribution).map(([tagId, count]) => {
+                  const tag = availableTags.find(t => t.id === parseInt(tagId));
+                  return tag ? (
+                    <Tag key={tagId} color={tag.color}>
+                      {tag.name}: {count}
+                    </Tag>
+                  ) : null;
+                })}
+              </Space>
+            </div>
+            <Table
+              dataSource={aiPreviewResults.slice(0, 20)}
+              rowKey="record_id"
+              size="small"
+              pagination={false}
+              scroll={{ y: 300 }}
+              columns={[
+                {
+                  title: '记录ID',
+                  dataIndex: 'record_id',
+                  key: 'record_id',
+                  width: 150,
+                },
+                {
+                  title: '推荐标签',
+                  key: 'tag',
+                  render: (_: any, record: any) => (
+                    record.tag_id ? (
+                      <Tag color={record.tag_color}>
+                        {record.tag_name || '未知标签'}
+                      </Tag>
+                    ) : (
+                      <Text type="secondary">无法确定</Text>
+                    )
+                  ),
+                },
+                {
+                  title: '置信度',
+                  dataIndex: 'confidence',
+                  key: 'confidence',
+                  render: (val: number) => (
+                    <Text type={val >= 0.7 ? 'success' : val >= 0.4 ? 'warning' : 'danger'}>
+                      {Math.round(val * 100)}%
+                    </Text>
+                  ),
+                },
+                {
+                  title: '推荐理由',
+                  dataIndex: 'reason',
+                  key: 'reason',
+                  ellipsis: true,
+                },
+              ]}
+            />
+            {aiPreviewResults.length > 20 && (
+              <Text type="secondary">显示前20条结果，共 {aiPreviewResults.length} 条</Text>
+            )}
+            <div style={{ marginTop: 16, textAlign: 'center' }}>
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleAIExecute}
+                loading={aiLoading}
+                icon={<TagsOutlined />}
+              >
+                确认执行打标 ({aiPreviewResults.length} 条)
+              </Button>
+            </div>
+          </>
+        )}
+
+        {aiPreviewLoading && (
+          <div style={{ textAlign: 'center', padding: 40 }}>
+            <Spin size="large" />
+            <p>AI正在分析数据，请稍候...</p>
+          </div>
+        )}
       </Modal>
 
       <Drawer

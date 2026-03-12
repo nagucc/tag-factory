@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     });
 
     const roles = rows.map(role => {
-      const roleData = role.toJSON();
+      const roleData = role.toJSON() as any;
       return {
         ...roleData,
         permissionCount: roleData.permissions?.length || 0,

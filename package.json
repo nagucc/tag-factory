@@ -3,27 +3,32 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 8080",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8080",
     "lint": "eslint",
     "db:init": "tsx src/lib/database/auto-init.ts"
   },
   "dependencies": {
     "@ant-design/charts": "^2.6.7",
     "@ant-design/icons": "^6.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/xml2js": "^0.4.14",
     "antd": "^6.2.3",
     "bcrypt": "^6.0.0",
     "csv-stringify": "^6.6.0",
+    "js-yaml": "^4.1.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.22.0",
     "mysql2": "^3.16.3",
     "next": "16.1.6",
+    "openai": "^6.22.0",
     "pg-hstore": "^2.3.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "sequelize": "^6.37.7",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

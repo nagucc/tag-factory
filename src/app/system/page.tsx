@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, Form, Input, Button, Select, Typography, App, Divider, Space } from 'antd';
-import { SaveOutlined, SecurityScanOutlined, GlobalOutlined, UserOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Button, Select, Typography, App, Divider, Space, Switch } from 'antd';
+import { SaveOutlined, SecurityScanOutlined, GlobalOutlined, UserOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/MainLayout';
 
 const { Title, Text } = Typography;
@@ -14,6 +14,10 @@ interface SystemConfig {
   jwtExpiresIn: string;
   maxLoginAttempts: number;
   lockoutDuration: number;
+  casEnabled: boolean;
+  casServerUrl: string;
+  casPathPrefix: string;
+  casVersion: string;
 }
 
 export default function SystemConfigPage() {
@@ -129,7 +133,7 @@ export default function SystemConfigPage() {
           </Form.Item>
         </Card>
 
-        <Card title={<><UserOutlined /> 用户配置</>}>
+        <Card title={<><UserOutlined /> 用户配置</>} style={{ marginBottom: 24 }}>
           <Form.Item
             name="defaultRole"
             label="新用户默认角色"
@@ -139,6 +143,48 @@ export default function SystemConfigPage() {
               <Option value="viewer">只读用户</Option>
             </Select>
           </Form.Item>
+        </Card>
+
+        <Card title={<><SafetyCertificateOutlined /> CAS单点登录配置</>} style={{ marginBottom: 24 }}>
+          <Form.Item
+            name="casEnabled"
+            label="启用CAS登录"
+            valuePropName="checked"
+          >
+            <Switch />
+          </Form.Item>
+
+          <Form.Item
+            name="casServerUrl"
+            label="CAS服务器地址"
+            tooltip="CAS服务器的根地址，不含路径，如 https://ids.ynu.edu.cn"
+          >
+            <Input placeholder="https://ids.ynu.edu.cn" />
+          </Form.Item>
+
+          <Form.Item
+            name="casPathPrefix"
+            label="CAS路径前缀"
+            tooltip="CAS服务端点路径前缀，标准CAS留空，云南大学CAS填 /authserver"
+          >
+            <Input placeholder="/authserver" />
+          </Form.Item>
+
+          <Form.Item
+            name="casVersion"
+            label="CAS协议版本"
+          >
+            <Select>
+              <Option value="3.0">CAS 3.0（推荐）</Option>
+              <Option value="2.0">CAS 2.0</Option>
+            </Select>
+          </Form.Item>
+
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            注意：CAS配置保存在 config/config.yaml 文件中。
+            标准CAS路径示例：https://cas.example.com/cas/login
+            云南大学CAS路径示例：https://ids.ynu.edu.cn/authserver/login
+          </Text>
         </Card>
 
         <Form.Item>

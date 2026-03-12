@@ -18,6 +18,8 @@ import WorkPlanRecord from './workPlanRecord';
 import AuditLog from './auditLog';
 import SystemConfig from './systemConfig';
 import LoginLog from './loginLog';
+import AITagTask from './aiTagTask';
+import PromptTemplate from './promptTemplate';
 
 Role.belongsToMany(Permission, { through: RolePermission, foreignKey: 'role_id', as: 'permissions' });
 Permission.belongsToMany(Role, { through: RolePermission, foreignKey: 'permission_id', as: 'roles' });
@@ -88,6 +90,15 @@ AuditLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 User.hasMany(LoginLog, { foreignKey: 'user_id', as: 'loginLogs' });
 LoginLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+WorkPlan.hasMany(AITagTask, { foreignKey: 'work_plan_id', as: 'aiTagTasks' });
+AITagTask.belongsTo(WorkPlan, { foreignKey: 'work_plan_id', as: 'workPlan' });
+
+User.hasMany(AITagTask, { foreignKey: 'user_id', as: 'aiTagTasks' });
+AITagTask.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+User.hasMany(PromptTemplate, { foreignKey: 'created_by', as: 'promptTemplates' });
+PromptTemplate.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+
 export { 
   sequelize, 
   User, 
@@ -108,5 +119,7 @@ export {
   WorkPlanRecord,
   AuditLog,
   SystemConfig,
-  LoginLog
+  LoginLog,
+  AITagTask,
+  PromptTemplate
 };

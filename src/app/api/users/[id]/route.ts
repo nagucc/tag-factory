@@ -55,7 +55,9 @@ export async function PUT(
       );
     }
 
-    if (username && username !== user.username) {
+    const userData = user.toJSON() as any;
+
+    if (username && username !== userData.username) {
       const existingUser = await User.findOne({ where: { username } });
       if (existingUser) {
         return NextResponse.json(
@@ -65,7 +67,7 @@ export async function PUT(
       }
     }
 
-    if (email && email !== user.email) {
+    if (email && email !== userData.email) {
       const existingEmail = await User.findOne({ where: { email } });
       if (existingEmail) {
         return NextResponse.json(
@@ -76,10 +78,10 @@ export async function PUT(
     }
 
     await user.update({
-      username: username || user.username,
-      email: email || user.email,
-      role_id: role_id !== undefined ? role_id : user.role_id,
-      status: status !== undefined ? status : user.status,
+      username: username || userData.username,
+      email: email || userData.email,
+      role_id: role_id !== undefined ? role_id : userData.role_id,
+      status: status !== undefined ? status : userData.status,
     });
 
     const updatedUser = await User.findByPk(id, {

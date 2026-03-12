@@ -1,18 +1,28 @@
 import { Sequelize } from 'sequelize';
 import mysql2 from 'mysql2';
+import { getDatabaseConfig } from '@/lib/config';
+
+// 获取数据库配置
+const dbConfig = getDatabaseConfig().mysql;
 
 const sequelize = new Sequelize({
   dialect: 'mysql',
   dialectModule: mysql2,
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306'),
-  username: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'root123',
-  database: process.env.DB_NAME || 'mydb',
+  host: dbConfig.host,
+  port: dbConfig.port,
+  username: dbConfig.username,
+  password: dbConfig.password,
+  database: dbConfig.database,
   logging: false,
   define: {
     timestamps: true,
     underscored: true,
+  },
+  pool: {
+    max: dbConfig.pool.max,
+    min: dbConfig.pool.min,
+    acquire: dbConfig.pool.acquire,
+    idle: dbConfig.pool.idle,
   },
 });
 

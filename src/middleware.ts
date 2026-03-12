@@ -6,7 +6,15 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-const apiPublicPaths = ['/api/auth/login', '/api/auth/reset-password', '/api/system/config'];
+const apiPublicPaths = [
+  '/api/auth/login',
+  '/api/auth/reset-password',
+  '/api/auth/cas/login',
+  '/api/auth/cas/callback',
+  '/api/auth/cas/config',
+  '/api/system/config',
+  '/api/debug/network',
+];
 
 interface TokenPayload {
   userId: number;

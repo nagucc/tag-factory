@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const role_id = searchParams.get('role_id');
 
-    const where: WhereOptions<User> = {};
+    const where: any = {};
     if (username) {
       where.username = { $like: `%${username}%` };
     }
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       status,
     });
 
-    const userWithRole = await User.findByPk(user.id, {
+    const userWithRole = await User.findByPk((user as any).id, {
       include: [{ model: Role, as: 'role' }],
       attributes: { exclude: ['password'] },
     });

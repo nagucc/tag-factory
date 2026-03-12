@@ -244,14 +244,15 @@ function MainLayout({ children, title }: MainLayoutProps) {
 
     items.push(
       {
-        type: 'divider' as const,
-      },
+        key: 'divider',
+        type: 'divider',
+      } as any,
       {
         key: 'logout',
         icon: <LogoutOutlined />,
         label: '退出登录',
         danger: true,
-      }
+      } as any
     );
 
     return items;

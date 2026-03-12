@@ -1,17 +1,61 @@
 'use client';
 
-import { useState } from 'react';
-import { Form, Input, Button, Card, Typography } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { Form, Input, Button, Card, Typography, Divider } from 'antd';
+import { UserOutlined, LockOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { App } from 'antd';
 
 const { Title, Text } = Typography;
 
-export default function LoginForm() {
+interface LoginFormProps {
+  initialCasEnabled?: boolean;
+}
+
+export default function LoginForm({ initialCasEnabled = false }: LoginFormProps) {
   const [loading, setLoading] = useState(false);
+  const [casEnabled, setCasEnabled] = useState(initialCasEnabled);
+  const initialCasEnabledRef = useRef(initialCasEnabled);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { message } = App.useApp();
+
+  // 检查URL中的错误参数
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      const errorMessages: Record<string, string> = {
+        cas_no_ticket: 'CAS登录失败：未获取到登录票据',
+        cas_not_configured: 'CAS未配置，请联系管理员',
+        cas_failed: 'CAS登录失败，请稍后重试',
+        account_disabled: '账户已被禁用，请联系管理员',
+      };
+      message.error(errorMessages[error] || '登录失败');
+    }
+  }, [searchParams, message]);
+
+  // 检查CAS是否启用（仅在客户端执行，且服务端未启用时）
+  useEffect(() => {
+    // 如果服务端已经确认启用，不需要再请求
+    if (initialCasEnabledRef.current) {
+      console.log('CAS enabled from server-side config');
+      return;
+    }
+    
+    const checkCasConfig = async () => {
+      try {
+        const response = await fetch('/api/auth/cas/config');
+        const data = await response.json();
+        console.log('CAS config response:', data);
+        setCasEnabled(data.enabled);
+      } catch (error) {
+        // CAS配置获取失败，不显示CAS登录按钮
+        console.error('Failed to fetch CAS config:', error);
+        setCasEnabled(false);
+      }
+    };
+    checkCasConfig();
+  }, []); // 空依赖数组，只在组件挂载时执行
 
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);
@@ -39,6 +83,11 @@ export default function LoginForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // CAS登录
+  const handleCasLogin = () => {
+    window.location.href = '/api/auth/cas/login';
   };
 
   return (
@@ -92,6 +141,23 @@ export default function LoginForm() {
             </Button>
           </Form.Item>
         </Form>
+
+        {casEnabled && (
+          <>
+            <Divider>
+              <Text type="secondary" style={{ fontSize: 12 }}>或</Text>
+            </Divider>
+            <Button
+              icon={<SafetyCertificateOutlined />}
+              onClick={handleCasLogin}
+              block
+              size="large"
+              style={{ marginBottom: 16 }}
+            >
+              CAS单点登录
+            </Button>
+          </>
+        )}
         
         <div style={{ textAlign: 'center' }}>
           <Text type="secondary" style={{ fontSize: 12 }}>

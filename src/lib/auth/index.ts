@@ -1,11 +1,16 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { User, Role, Permission } from '@/lib/database/models';
+import { getJWTConfig, getSecurityConfig } from '@/lib/config';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION = 30 * 60 * 1000;
+// 获取配置
+const jwtConfig = getJWTConfig();
+const securityConfig = getSecurityConfig();
+
+const JWT_SECRET = jwtConfig.secret;
+const JWT_EXPIRES_IN = jwtConfig.expiresIn;
+const MAX_LOGIN_ATTEMPTS = securityConfig.maxLoginAttempts;
+const LOCKOUT_DURATION = securityConfig.lockoutDuration * 60 * 1000;
 
 export interface TokenPayload {
   userId: number;
@@ -31,7 +36,7 @@ export function verifyToken(token: string): TokenPayload | null {
 }
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10);
+  return bcrypt.hash(password, securityConfig.bcryptRounds);
 }
 
 export async function comparePassword(password: string, hash: string): Promise<boolean> {
